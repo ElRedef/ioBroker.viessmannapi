@@ -29,16 +29,16 @@
             "zh-cn": "Viessmannapi"
         },
         "desc": {
-            "en": "Adapter for Viessmannapi",
-            "de": "Adapter für Viessmannapi",
-            "ru": "Адаптер для Viessmannapi",
-            "pt": "Adaptador para viessmannapi",
-            "nl": "Adapter voor Viessmannapi",
-            "fr": "Adaptateur pour Viessmannapi",
-            "it": "Adattatore per Viessmannapi",
-            "es": "Adaptador para Viessmannapi",
-            "pl": "Adapter do Viessmannapi",
-            "zh-cn": "菲斯曼适配器"
+            "en": "Adapter for Viessmannapi Devices with Vitoconnect Box",
+            "de": "Adapter für Viessmannapi Anlagen mit Vitoconnect Box",
+            "ru": "Адаптер для устройств Viessmannapi с Vitoconnect Box",
+            "pt": "Adaptador para dispositivos Viessmannapi com caixa Vitoconnect",
+            "nl": "Adapter voor Viessmannapi-apparaten met Vitoconnect Box",
+            "fr": "Adaptateur pour appareils Viessmannapi avec Vitoconnect Box",
+            "it": "Adattatore per dispositivi Viessmannapi con Vitoconnect Box",
+            "es": "Adaptador para dispositivos Viessmannapi con Vitoconnect Box",
+            "pl": "Adapter do urządzeń Viessmannapi z Vitoconnect Box",
+            "zh-cn": "带有 Vitoconnect 盒的 Viessmannapi 设备适配器"
         },
         "authors": [
             "TA2k <tombox2020@gmail.com>"
