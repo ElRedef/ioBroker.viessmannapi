@@ -419,6 +419,9 @@ class Viessmannapi extends utils.Adapter {
                 }
                 const data = {};
                 data[param] = state.val;
+                if (!isNaN(state.val)) {
+                    data[param] = Number(state.val);
+                }
                 const headers = {
                     "Content-Type": "application/json",
                     Accept: "*/*",
