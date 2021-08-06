@@ -36,11 +36,14 @@ viessmannapi.0.XXX.0.features.heating.sensors.temperature.outside.properties.val
 **Regelungen für Wand- oder Kompaktgeräte**
 Vitotronic 200, Typ HO1, HO1A, HO1B, HO1D, HO2B, HO2C
 Vitotronic 200 RF, Typ HO1C, HO1E
+
 **Regelungen für bodenstehende Heizkessel**
 Vitotronic 200, Typ KO1B, KO2B, KW6, KW6A, KW6B, KW1, KW2, KW4, KW5
 Vitotronic 300, Typ KW3
+
 **Regelungen für Wärmepumpen und Hybridgeräte**
 Vitotronic 200, Typ WO1A, WO1B, WO1C
+
 **Regelungen für Festbrennstoffkessel**
 Vitoligno 200-S mit Ecotronic (ab Softwarestand 2.03)
 Vitoligno 250-S mit Ecotronic (ab Softwarestand 2.00)
