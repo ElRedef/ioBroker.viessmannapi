@@ -55,7 +55,7 @@ class Viessmannapi extends utils.Adapter {
             }, this.config.interval * 60 * 1000);
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken();
-            }, this.session.expires_in * 1000);
+            }, (this.session.expires_in - 100) * 1000);
         }
     }
     async login() {
@@ -117,6 +117,9 @@ class Viessmannapi extends utils.Adapter {
                     this.log.error(JSON.stringify(error.response.data));
                     return;
                 }
+                if (error.response && error.response.status === 500) {
+                    this.log.info("Please check username and password.");
+                }
                 if (error.request) {
                     this.log.debug(JSON.stringify(error.request._currentUrl));
                     code = qs.parse(error.request._currentUrl.split("?")[1]).code;
@@ -145,6 +148,7 @@ class Viessmannapi extends utils.Adapter {
                 return res.data;
             })
             .catch((error) => {
+                this.setState("info.connection", false, true);
                 this.log.error(error);
                 if (error.response) {
                     this.log.error(JSON.stringify(error.response.data));
@@ -334,6 +338,10 @@ class Viessmannapi extends utils.Adapter {
 
                             return;
                         }
+                        if (error.response && error.response.status === 502) {
+                            this.log.info(JSON.stringify(error.response.data));
+                            this.log.info("Please check the connection of your gateway");
+                        }
                         this.log.error(element.url);
                         this.log.error(error);
                         error.response && this.log.debug(JSON.stringify(error.response.data));
@@ -358,6 +366,7 @@ class Viessmannapi extends utils.Adapter {
                 return res.data;
             })
             .catch((error) => {
+                this.setState("info.connection", false, true);
                 this.log.error("refresh token failed");
                 this.log.error(error);
                 error.response && this.log.error(JSON.stringify(error.response.data));
@@ -407,20 +416,20 @@ class Viessmannapi extends utils.Adapter {
                 const parentPath = id.split(".").slice(1, -1).slice(1).join(".");
 
                 const uriState = await this.getStateAsync(parentPath + ".uri");
-                const paramsStates = await this.getStatesAsync(parentPath + ".params.*");
+                const idState = await this.getObjectAsync(parentPath + ".setValue");
 
-                const param = Object.keys(paramsStates)[0]
-                    .split(".")
-                    .slice(parentPath.split(".").length + 3)[0];
+                const param = idState.common.param;
 
                 if (!uriState || !uriState.val) {
                     this.log.info("No URI found");
                     return;
                 }
                 const data = {};
-                data[param] = state.val;
-                if (!isNaN(state.val)) {
-                    data[param] = Number(state.val);
+                if (param) {
+                    data[param] = state.val;
+                    if (!isNaN(state.val)) {
+                        data[param] = Number(state.val);
+                    }
                 }
                 const headers = {
                     "Content-Type": "application/json",
