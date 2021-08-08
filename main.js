@@ -161,6 +161,9 @@ class Viessmannapi extends utils.Adapter {
             .catch((error) => {
                 this.setState("info.connection", false, true);
                 this.log.error(error);
+                if (error.response && error.response.status === 429) {
+                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
+                }
                 if (error.response) {
                     this.log.error(JSON.stringify(error.response.data));
                 }
@@ -197,6 +200,9 @@ class Viessmannapi extends utils.Adapter {
             })
             .catch((error) => {
                 this.log.error(error);
+                if (error.response && error.response.status === 429) {
+                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
+                }
                 error.response && this.log.error(JSON.stringify(error.response.data));
             });
 
@@ -223,6 +229,9 @@ class Viessmannapi extends utils.Adapter {
             })
             .catch((error) => {
                 this.log.error(error);
+                if (error.response && error.response.status === 429) {
+                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
+                }
                 error.response && this.log.error(JSON.stringify(error.response.data));
             });
 
@@ -319,6 +328,9 @@ class Viessmannapi extends utils.Adapter {
 
                             return;
                         }
+                        if (error.response && error.response.status === 429) {
+                            this.log.info("Rate limit reached. Will be reseted next day 02:00");
+                        }
                         if (error.response && error.response.status === 502) {
                             this.log.info(JSON.stringify(error.response.data));
                             this.log.info("Please check the connection of your gateway");
@@ -369,6 +381,9 @@ class Viessmannapi extends utils.Adapter {
                     }, 1000 * 30);
 
                     return;
+                }
+                if (error.response && error.response.status === 429) {
+                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
                 }
                 if (error.response && error.response.status === 502) {
                     this.log.info(JSON.stringify(error.response.data));
