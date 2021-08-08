@@ -84,7 +84,7 @@
         "password": "",
         "client_id": "",
         "interval": 5,
-        "eventInterval": 60
+        "eventInterval": 300
     },
     "objects": [],
     "instanceObjects": [
