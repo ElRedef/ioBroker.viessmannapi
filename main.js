@@ -374,7 +374,7 @@ class Viessmannapi extends utils.Adapter {
                     this.log.info(JSON.stringify(error.response.data));
                     this.log.info("Please check the connection of your gateway");
                 }
-                this.log.error(element.url);
+                this.log.error("Receiving Events");
                 this.log.error(error);
                 error.response && this.log.debug(JSON.stringify(error.response.data));
             });
