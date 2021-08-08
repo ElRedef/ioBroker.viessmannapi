@@ -69,13 +69,15 @@
 
             <!-- For example columns with settings: -->
             <div class="row">
-                Visit <a href="https://developer.viessmann.com/de/clients">https://developer.viessmann.com/de/clients</a> and create a new client. <br /><br />
-                Name: iobroker<br />
-                deactivate Google reCAPTCHA<br />
-                URI: http://localhost:4200/<br />
-                <br /><br />
-                Copy Client ID in the instance settings.<br />
-                <br />
+                <div class="col s6 input-field">
+                    Visit <a href="https://developer.viessmann.com/de/clients" target="_blank">https://developer.viessmann.com/de/clients</a> and create a new client. <br /><br />
+                    Name: iobroker<br />
+                    deactivate Google reCAPTCHA<br />
+                    URI: http://localhost:4200/<br />
+                    <br /><br />
+                    Copy Client ID in the instance settings.<br />
+                    <br />
+                </div>
             </div>
             <div class="row">
                 <div class="col s6 input-field">
@@ -97,14 +99,14 @@
             </div>
 
             <div class="row">
-                <div class="col s2 input-field">
+                <div class="col s6 input-field">
                     <input type="number" class="value" id="interval" />
                     <label for="interval" class="translate">Update device status in minutes</label>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col s2 input-field">
+                <div class="col s6 input-field">
                     <input type="number" class="value" id="eventInterval" />
                     <label for="eventInterval" class="translate">Update gateway events in minutes</label>
                 </div>
