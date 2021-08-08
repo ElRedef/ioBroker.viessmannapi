@@ -35,8 +35,13 @@ class Viessmannapi extends utils.Adapter {
             this.log.info("Set interval to minimum 0.5");
             this.config.interval = 0.5;
         }
+        if (this.config.eventInterval < 0.5) {
+            this.log.info("Set interval to minimum 0.5");
+            this.config.eventInterval = 0.5;
+        }
         this.requestClient = axios.create();
         this.updateInterval = null;
+        this.eventInterval = null;
         this.reLoginTimeout = null;
         this.refreshTokenTimeout = null;
         this.extractKeys = extractKeys;
@@ -50,9 +55,15 @@ class Viessmannapi extends utils.Adapter {
         if (this.session.access_token) {
             await this.getDeviceIds();
             await this.updateDevices();
+            await this.getEvents();
             this.updateInterval = setInterval(async () => {
                 await this.updateDevices();
             }, this.config.interval * 60 * 1000);
+
+            this.eventInterval = setInterval(async () => {
+                await this.getEvents();
+            }, this.config.eventInterval * 60 * 1000);
+
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken();
             }, (this.session.expires_in - 100) * 1000);
@@ -231,13 +242,7 @@ class Viessmannapi extends utils.Adapter {
                         },
                         native: {},
                     });
-                    // await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".remote", {
-                    //     type: "channel",
-                    //     common: {
-                    //         name: "Remote Controls",
-                    //     },
-                    //     native: {},
-                    // });
+
                     await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".general", {
                         type: "channel",
                         common: {
@@ -246,20 +251,6 @@ class Viessmannapi extends utils.Adapter {
                         native: {},
                     });
 
-                    // const remoteArray = [];
-                    // remoteArray.forEach((remote) => {
-                    //     this.setObjectNotExists(this.installationId + "." + device.id + ".remote." + remote.command, {
-                    //         type: "state",
-                    //         common: {
-                    //             name: remote.name || "",
-                    //             type: remote.type || "boolean",
-                    //             role: remote.role || "boolean",
-                    //             write: true,
-                    //             read: true,
-                    //         },
-                    //         native: {},
-                    //     });
-                    // });
                     this.extractKeys(this, this.installationId + "." + device.id + ".general", device);
                 }
             })
@@ -273,14 +264,7 @@ class Viessmannapi extends utils.Adapter {
                 path: "features",
                 url: "https://api.viessmann.com/iot/v1/equipment/installations/" + this.installationId + "/gateways/" + this.gatewaySerial + "/devices/$id/features",
                 desc: "Features and States of the device",
-            },
-
-            {
-                path: "events",
-                url: "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId,
-                desc: "Events of the installation",
-                limit: 1,
-                current: 0,
+                exclude: "gateway",
             },
         ];
 
@@ -293,11 +277,8 @@ class Viessmannapi extends utils.Adapter {
         this.idArray.forEach((id) => {
             statusArray.forEach(async (element) => {
                 const url = element.url.replace("$id", id);
-                if (element.limit) {
-                    element.current += 1;
-                    if (element.current > element.limit) {
-                        return;
-                    }
+                if (id === element.exclude) {
+                    return;
                 }
                 await this.requestClient({
                     method: "get",
@@ -349,6 +330,55 @@ class Viessmannapi extends utils.Adapter {
             });
         });
     }
+    async getEvents() {
+        const headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+            "User-Agent": "ioBroker 2.0.0",
+            Authorization: "Bearer " + this.session.access_token,
+        };
+
+        await this.requestClient({
+            method: "get",
+            url: "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId,
+            headers: headers,
+        })
+            .then((res) => {
+                this.log.debug(JSON.stringify(res.data));
+                if (!res.data) {
+                    return;
+                }
+                let data = res.data;
+                const keys = Object.keys(res.data);
+                if (keys.length === 1) {
+                    data = res.data[keys[0]];
+                }
+                if (data.length === 1) {
+                    data = data[0];
+                }
+
+                this.extractKeys(this, this.installationId + ".events", data, null, true);
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    error.response && this.log.debug(JSON.stringify(error.response.data));
+                    this.log.info(element.path + " receive 401 error. Refresh Token in 30 seconds");
+                    clearTimeout(this.refreshTokenTimeout);
+                    this.refreshTokenTimeout = setTimeout(() => {
+                        this.refreshToken();
+                    }, 1000 * 30);
+
+                    return;
+                }
+                if (error.response && error.response.status === 502) {
+                    this.log.info(JSON.stringify(error.response.data));
+                    this.log.info("Please check the connection of your gateway");
+                }
+                this.log.error(element.url);
+                this.log.error(error);
+                error.response && this.log.debug(JSON.stringify(error.response.data));
+            });
+    }
 
     async refreshToken() {
         await this.requestClient({
@@ -397,6 +427,7 @@ class Viessmannapi extends utils.Adapter {
             clearTimeout(this.reLoginTimeout);
             clearTimeout(this.refreshTokenTimeout);
             clearInterval(this.updateInterval);
+            clearInterval(this.eventInterval);
             clearInterval(this.refreshTokenInterval);
             callback();
         } catch (e) {
