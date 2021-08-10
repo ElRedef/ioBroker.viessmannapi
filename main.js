@@ -295,7 +295,7 @@ class Viessmannapi extends utils.Adapter {
                     headers: headers,
                 })
                     .then((res) => {
-                        this.log.debug(JSON.stringify(res.data));
+                        this.log.debug(url + " " + JSON.stringify(res.data));
                         if (!res.data) {
                             return;
                         }
