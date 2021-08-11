@@ -243,7 +243,7 @@ class Viessmannapi extends utils.Adapter {
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
                 for (const device of res.data.data) {
-                    this.idArray.push(device.id);
+                    this.idArray.push({ id: device.id, type: device.roles[0] });
                     await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
                         type: "device",
                         common: {
@@ -273,7 +273,6 @@ class Viessmannapi extends utils.Adapter {
                 path: "features",
                 url: "https://api.viessmann.com/iot/v1/equipment/installations/" + this.installationId + "/gateways/" + this.gatewaySerial + "/devices/$id/features",
                 desc: "Features and States of the device",
-                exclude: "gateway",
             },
         ];
 
@@ -283,10 +282,11 @@ class Viessmannapi extends utils.Adapter {
             "User-Agent": "ioBroker 2.0.0",
             Authorization: "Bearer " + this.session.access_token,
         };
-        this.idArray.forEach((id) => {
+        this.idArray.forEach((device) => {
             statusArray.forEach(async (element) => {
-                const url = element.url.replace("$id", id);
-                if (id === element.exclude) {
+                const url = element.url.replace("$id", device.id);
+                if (device.type === "type:gateway" || device.type === "type:virtual") {
+                    this.log.debug("ignore " + device.type);
                     return;
                 }
                 await this.requestClient({
@@ -295,7 +295,7 @@ class Viessmannapi extends utils.Adapter {
                     headers: headers,
                 })
                     .then((res) => {
-                        this.log.debug(url + " " + JSON.stringify(res.data));
+                        this.log.debug(url + " " + device.type + " " + JSON.stringify(res.data));
                         if (!res.data) {
                             return;
                         }
@@ -307,13 +307,8 @@ class Viessmannapi extends utils.Adapter {
                         if (data.length === 1) {
                             data = data[0];
                         }
-                        let extractPath = this.installationId + "." + id + "." + element.path;
+                        let extractPath = this.installationId + "." + device + "." + element.path;
                         let forceIndex = null;
-                        const preferedArrayName = null;
-                        if (element.path === "events") {
-                            forceIndex = true;
-                            extractPath = this.installationId + "." + element.path;
-                        }
 
                         this.extractKeys(this, extractPath, data, "feature", forceIndex, false, element.desc);
                     })
