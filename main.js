@@ -54,7 +54,7 @@ class Viessmannapi extends utils.Adapter {
         await this.login();
         if (this.session.access_token) {
             await this.getDeviceIds();
-            await this.updateDevices();
+            await this.updateDevices(true);
             await this.getEvents();
             this.updateInterval = setInterval(async () => {
                 await this.updateDevices();
@@ -267,7 +267,7 @@ class Viessmannapi extends utils.Adapter {
                 this.log.error(error);
             });
     }
-    async updateDevices() {
+    async updateDevices(ignoreFilter) {
         const statusArray = [
             {
                 path: "features",
@@ -285,7 +285,7 @@ class Viessmannapi extends utils.Adapter {
         this.idArray.forEach((device) => {
             statusArray.forEach(async (element) => {
                 const url = element.url.replace("$id", device.id);
-                if (device.type === "type:gateway" || device.type === "type:virtual") {
+                if (!ignoreFilter && (device.type === "type:gateway" || device.type === "type:virtual")) {
                     this.log.debug("ignore " + device.type);
                     return;
                 }
@@ -295,7 +295,7 @@ class Viessmannapi extends utils.Adapter {
                     headers: headers,
                 })
                     .then((res) => {
-                        this.log.debug(url + " " + device.type + " " + JSON.stringify(res.data));
+                        this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
                         if (!res.data) {
                             return;
                         }
@@ -307,7 +307,7 @@ class Viessmannapi extends utils.Adapter {
                         if (data.length === 1) {
                             data = data[0];
                         }
-                        let extractPath = this.installationId + "." + device + "." + element.path;
+                        let extractPath = this.installationId + "." + device.id + "." + element.path;
                         let forceIndex = null;
 
                         this.extractKeys(this, extractPath, data, "feature", forceIndex, false, element.desc);
