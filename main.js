@@ -31,17 +31,14 @@ class Viessmannapi extends utils.Adapter {
     async onReady() {
         // Reset the connection indicator during startup
         this.setState("info.connection", false, true);
+        this.setState("info.token", "leer", true);
         if (this.config.interval < 0.5) {
             this.log.info("Set interval to minimum 0.5");
             this.config.interval = 0.5;
         }
-        if (this.config.eventInterval < 0.5) {
-            this.log.info("Set interval to minimum 0.5");
-            this.config.eventInterval = 0.5;
-        }
+
         this.requestClient = axios.create();
         this.updateInterval = null;
-        this.eventInterval = null;
         this.reLoginTimeout = null;
         this.refreshTokenTimeout = null;
         this.extractKeys = extractKeys;
@@ -53,17 +50,17 @@ class Viessmannapi extends utils.Adapter {
 
         await this.login();
         if (this.session.access_token) {
+            
+            //this.log.error("access token: "+this.session.access_token); //JF
+            this.setState("info.token", this.session.access_token, true);  //JF
+
+
+
             await this.getDeviceIds();
-            await this.updateDevices(true);
-            await this.getEvents();
+            await this.updateDevices();
             this.updateInterval = setInterval(async () => {
                 await this.updateDevices();
             }, this.config.interval * 60 * 1000);
-
-            this.eventInterval = setInterval(async () => {
-                await this.getEvents();
-            }, this.config.eventInterval * 60 * 1000);
-
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken();
             }, (this.session.expires_in - 100) * 1000);
@@ -161,9 +158,6 @@ class Viessmannapi extends utils.Adapter {
             .catch((error) => {
                 this.setState("info.connection", false, true);
                 this.log.error(error);
-                if (error.response && error.response.status === 429) {
-                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
-                }
                 if (error.response) {
                     this.log.error(JSON.stringify(error.response.data));
                 }
@@ -194,15 +188,13 @@ class Viessmannapi extends utils.Adapter {
                         },
                         native: {},
                     });
-                    this.extractKeys(this, installationId, installation);
+                    //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
+                    //this.extractKeys(this, installationId, installation);
                     return installationId;
                 }
             })
             .catch((error) => {
                 this.log.error(error);
-                if (error.response && error.response.status === 429) {
-                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
-                }
                 error.response && this.log.error(JSON.stringify(error.response.data));
             });
 
@@ -223,15 +215,13 @@ class Viessmannapi extends utils.Adapter {
                         },
                         native: {},
                     });
-                    this.extractKeys(this, this.installationId + ".installationGateway", gateway);
+                    //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
+                    //this.extractKeys(this, this.installationId + ".installationGateway", gateway);
                     return gatewayId;
                 }
             })
             .catch((error) => {
                 this.log.error(error);
-                if (error.response && error.response.status === 429) {
-                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
-                }
                 error.response && this.log.error(JSON.stringify(error.response.data));
             });
 
@@ -243,7 +233,7 @@ class Viessmannapi extends utils.Adapter {
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
                 for (const device of res.data.data) {
-                    this.idArray.push({ id: device.id, type: device.roles[0] });
+                    this.idArray.push(device.id);
                     await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
                         type: "device",
                         common: {
@@ -251,7 +241,13 @@ class Viessmannapi extends utils.Adapter {
                         },
                         native: {},
                     });
-
+                    // await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".remote", {
+                    //     type: "channel",
+                    //     common: {
+                    //         name: "Remote Controls",
+                    //     },
+                    //     native: {},
+                    // });
                     await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".general", {
                         type: "channel",
                         common: {
@@ -260,20 +256,45 @@ class Viessmannapi extends utils.Adapter {
                         native: {},
                     });
 
-                    this.extractKeys(this, this.installationId + "." + device.id + ".general", device);
+                    // const remoteArray = [];
+                    // remoteArray.forEach((remote) => {
+                    //     this.setObjectNotExists(this.installationId + "." + device.id + ".remote." + remote.command, {
+                    //         type: "state",
+                    //         common: {
+                    //             name: remote.name || "",
+                    //             type: remote.type || "boolean",
+                    //             role: remote.role || "boolean",
+                    //             write: true,
+                    //             read: true,
+                    //         },
+                    //         native: {},
+                    //     });
+                    // });
+                    //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
+                    //this.extractKeys(this, this.installationId + "." + device.id + ".general", device);
                 }
             })
             .catch((error) => {
                 this.log.error(error);
             });
     }
-    async updateDevices(ignoreFilter) {
+    async updateDevices() {
+        
         const statusArray = [
             {
                 path: "features",
                 url: "https://api.viessmann.com/iot/v1/equipment/installations/" + this.installationId + "/gateways/" + this.gatewaySerial + "/devices/$id/features",
                 desc: "Features and States of the device",
             },
+
+            //JF: benötigt eine separate behandlung wenn überhaupt notwendig?
+            /*{
+                path: "events",
+                url: "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId,
+                desc: "Events of the installation",
+                limit: 1,
+                current: 0,
+            },*/
         ];
 
         const headers = {
@@ -282,12 +303,14 @@ class Viessmannapi extends utils.Adapter {
             "User-Agent": "ioBroker 2.0.0",
             Authorization: "Bearer " + this.session.access_token,
         };
-        this.idArray.forEach((device) => {
+        this.idArray.forEach((id) => {
             statusArray.forEach(async (element) => {
-                const url = element.url.replace("$id", device.id);
-                if (!ignoreFilter && (device.type === "type:gateway" || device.type === "type:virtual")) {
-                    this.log.debug("ignore " + device.type);
-                    return;
+                const url = element.url.replace("$id", id);
+                if (element.limit) {
+                    element.current += 1;
+                    if (element.current > element.limit) {
+                        return;
+                    }
                 }
                 await this.requestClient({
                     method: "get",
@@ -295,22 +318,31 @@ class Viessmannapi extends utils.Adapter {
                     headers: headers,
                 })
                     .then((res) => {
-                        this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
+                        this.log.error(url); //JF
+                        //this.log.error(JSON.stringify(res.data)); //JF
+                        //this.log.error("------------------"); //JF
                         if (!res.data) {
                             return;
                         }
-                        let data = res.data;
+                        /*let data = res.data;
                         const keys = Object.keys(res.data);
                         if (keys.length === 1) {
                             data = res.data[keys[0]];
                         }
                         if (data.length === 1) {
                             data = data[0];
-                        }
-                        let extractPath = this.installationId + "." + device.id + "." + element.path;
+                        }*/
+                        let extractPath = this.installationId + "." + id + "." + element.path;
                         let forceIndex = null;
+                        const preferedArrayName = null;                                                                 
+                        if (element.path === "events") {
+                            forceIndex = true;
+                            extractPath = this.installationId + "." + element.path;
+                        }
 
-                        this.extractKeys(this, extractPath, data, "feature", forceIndex, false, element.desc);
+                        
+
+                        this.extractKeys(this, extractPath, res.data, "feature", forceIndex, false, element.desc);
                     })
                     .catch((error) => {
                         if (error.response && error.response.status === 401) {
@@ -323,9 +355,6 @@ class Viessmannapi extends utils.Adapter {
 
                             return;
                         }
-                        if (error.response && error.response.status === 429) {
-                            this.log.info("Rate limit reached. Will be reseted next day 02:00");
-                        }
                         if (error.response && error.response.status === 502) {
                             this.log.info(JSON.stringify(error.response.data));
                             this.log.info("Please check the connection of your gateway");
@@ -337,58 +366,10 @@ class Viessmannapi extends utils.Adapter {
             });
         });
     }
-    async getEvents() {
-        const headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Accept: "application/json",
-            "User-Agent": "ioBroker 2.0.0",
-            Authorization: "Bearer " + this.session.access_token,
-        };
 
-        await this.requestClient({
-            method: "get",
-            url: "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId,
-            headers: headers,
-        })
-            .then((res) => {
-                this.log.debug(JSON.stringify(res.data));
-                if (!res.data) {
-                    return;
-                }
-                let data = res.data;
-                const keys = Object.keys(res.data);
-                if (keys.length === 1) {
-                    data = res.data[keys[0]];
-                }
-                if (data.length === 1) {
-                    data = data[0];
-                }
 
-                this.extractKeys(this, this.installationId + ".events", data, null, true);
-            })
-            .catch((error) => {
-                if (error.response && error.response.status === 401) {
-                    error.response && this.log.debug(JSON.stringify(error.response.data));
-                    this.log.info(element.path + " receive 401 error. Refresh Token in 30 seconds");
-                    clearTimeout(this.refreshTokenTimeout);
-                    this.refreshTokenTimeout = setTimeout(() => {
-                        this.refreshToken();
-                    }, 1000 * 30);
 
-                    return;
-                }
-                if (error.response && error.response.status === 429) {
-                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
-                }
-                if (error.response && error.response.status === 502) {
-                    this.log.info(JSON.stringify(error.response.data));
-                    this.log.info("Please check the connection of your gateway");
-                }
-                this.log.error("Receiving Events");
-                this.log.error(error);
-                error.response && this.log.debug(JSON.stringify(error.response.data));
-            });
-    }
+
 
     async refreshToken() {
         await this.requestClient({
@@ -437,7 +418,6 @@ class Viessmannapi extends utils.Adapter {
             clearTimeout(this.reLoginTimeout);
             clearTimeout(this.refreshTokenTimeout);
             clearInterval(this.updateInterval);
-            clearInterval(this.eventInterval);
             clearInterval(this.refreshTokenInterval);
             callback();
         } catch (e) {
