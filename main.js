@@ -307,8 +307,8 @@ class Viessmannapi extends utils.Adapter {
                         if (data.length === 1) {
                             data = data[0];
                         }
-                        let extractPath = this.installationId + "." + device.id + "." + element.path;
-                        let forceIndex = null;
+                        const extractPath = this.installationId + "." + device.id + "." + element.path;
+                        const forceIndex = null;
 
                         this.extractKeys(this, extractPath, data, "feature", forceIndex, false, element.desc);
                     })

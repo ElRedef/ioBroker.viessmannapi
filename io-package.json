@@ -1,11 +1,11 @@
 {
     "common": {
         "name": "viessmannapi",
-        "version": "2.0.0",
+        "version": "2.0.1",
         "news": {
-            "2.0.0": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
+            "2.0.1": {
+                "en": "initial release for new API. States are changed.",
+                "de": "Erstveröffentlichung neue API. Datenpunkte haben sich geändert.",
                 "ru": "Начальная версия",
                 "pt": "lançamento inicial",
                 "nl": "Eerste uitgave",

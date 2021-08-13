@@ -16,21 +16,24 @@
 
 Adapter for Viessmannapi
 
-Visit https://developer.viessmann.com/de/clients and create a new client.
+Man benötigt eine ClientID von der Viessmann API
+
+
+https://developer.viessmann.com/de/clients besuchen und eine Client ID mit diesen Optionen erstellen:
 
 Name: iobroker
-deactivate Google reCAPTCHA
+Google reCAPTCHA deaktivieren
 URI: http://localhost:4200/
 
-Copy Client ID in the instance settings.
+Die Client ID in die Einstellungen kopieren
 
-To change parameter set the state setValue
-Example:
+**Außentemperatur findet sich z.B. hier:
+viessmannapi.0.XXXXX.0.features.heating.sensors.temperature.outside.properties.value.value**
 
-***viessmannapi.0.XXXXX.0.features.heating.dhw.temperature.main.commands.setTargetTemperature.setValue***
+**Remote Befehle sind möglich unter
+viessmannapi.0.XXXXX.0.features.heating.dhw.temperature.main.commands.setTargetTemperature.setValue**
 
-**Outdoor Temperature
-viessmannapi.0.XXX.0.features.heating.sensors.temperature.outside.properties.value.value**
+
 
 **Kompatibilitätsliste**:
 **Regelungen für Wand- oder Kompaktgeräte**
@@ -80,20 +83,20 @@ Warmwasser Ist Temperatur:	viessmannapi.0.xxx.0.features.heating.dhw.sensors.tem
 Temperatur Außensensor:		viessmannapi.0.xxx.0.features.heating.sensors.temperature.outside.properties.value.value
 Statistik Kompressor Starts:	viessmannapi.0.xxx.0.features.heating.compressors.0.statistics.properties.starts.value
 Statistik Kompressor Stunden:	viessmannapi.0.xxx.0.features.heating.compressors.0.statistics.properties.hours.value
+Temperatursensoren der Heizkreise:   viessmannapi.0.xxxxxxx.0.features.heating.circuits.0.sensors.temperature.supply.properties.value.value
  
- 
-Primärkreis Vorlauftemperatur:		viessmannapi.0.xxx.0.features.heating.primaryCircuit.sensors.temperature.supply.properties.value.value
-Sekundärkreis Vorlauftemperatur:	viessmannapi.0.xxx.0.features.heating.secondaryCircuit.sensors.temperature.supply.properties.value.value
-Sekundärkreis Rücklauftemperatur:	viessmannapi.0.xxx.0.features.heating.secondaryCircuit.sensors.temperature.return.properties.value.value
-?					viessmannapi.0.xxx.0.features.heating.sensors.temperature.return.properties.value.value
+Primärkreis Vorlauftemperatur:		viessmann.0.xxx.0.features.heating.primaryCircuit.sensors.temperature.supply.properties.value.value
+Sekundärkreis Vorlauftemperatur:	viessmann.0.xxx.0.features.heating.secondaryCircuit.sensors.temperature.supply.properties.value.value
+Sekundärkreis Rücklauftemperatur:	viessmann.0.xxx.0.features.heating.secondaryCircuit.sensors.temperature.return.properties.value.value
+?					viessmann.0.xxx.0.features.heating.sensors.temperature.return.properties.value.value
 
 ```
 
 ## Changelog
 
-### 2.0.0
+### 2.0.1
 
--   (TA2k) initial release
+-   (TA2k) initial release for new API. Complete new Data objects
 
 ## License
 
