@@ -22,7 +22,9 @@ Man benötigt eine ClientID von der Viessmann API
 https://developer.viessmann.com/de/clients besuchen und eine Client ID mit diesen Optionen erstellen:
 
 Name: iobroker
+
 Google reCAPTCHA deaktivieren
+
 URI: http://localhost:4200/
 
 Die Client ID in die Einstellungen kopieren
