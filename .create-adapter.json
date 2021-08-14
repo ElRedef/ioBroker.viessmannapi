@@ -1,10 +1,10 @@
 {
     "cli": true,
-    "adapterName": "viessmannapi_test",
-    "title": "Viessmannapi_test",
+    "adapterName": "viessmannapi_testbranch",
+    "title": "viessmannapi_testbranch",
     "description": "Adapter for Viessmannapi. Test for easier datapoints",
     "keywords": [
-        "Viessmannapi_test"
+        "viessmannapi_testbranch"
     ],
     "expert": "yes",
     "features": [

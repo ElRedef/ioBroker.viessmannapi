@@ -1,9 +1,9 @@
 {
   "_from": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
-  "_id": "iobroker.viessmannapi_test@0.0.0",
+  "_id": "iobroker.viessmannapi_testbranch@0.0.0",
   "_inBundle": false,
   "_integrity": "",
-  "_location": "/iobroker.viessmannapi_test",
+  "_location": "/iobroker.viessmannapi_testbranch",
   "_phantomChildren": {
     "side-channel": "1.0.4"
   },
@@ -65,7 +65,7 @@
   ],
   "license": "MIT",
   "main": "main.js",
-  "name": "iobroker.viessmannapi_test",
+  "name": "iobroker.viessmannapi_testbranch",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TA2k/ioBroker.viessmannapi.git"
