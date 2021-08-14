@@ -1,10 +1,10 @@
 {
     "cli": true,
-    "adapterName": "viessmannapi",
-    "title": "Viessmannapi",
-    "description": "Adapter for Viessmannapi",
+    "adapterName": "viessmannapi_test",
+    "title": "Viessmannapi_test",
+    "description": "Adapter for Viessmannapi. Test for easier datapoints",
     "keywords": [
-        "Viessmannapi"
+        "Viessmannapi_test"
     ],
     "expert": "yes",
     "features": [
@@ -27,9 +27,9 @@
     "indentation": "Space (4)",
     "quotes": "double",
     "es6class": "yes",
-    "authorName": "TA2k",
-    "authorGithub": "TA2k",
-    "authorEmail": "tombox2020@gmail.com",
+    "authorName": "",
+    "authorGithub": "",
+    "authorEmail": "",
     "gitRemoteProtocol": "HTTPS",
     "gitCommit": "no",
     "license": "MIT License",
