@@ -1,26 +1,43 @@
 {
-  "name": "iobroker.viessmannapi",
-  "version": "2.0.0",
-  "description": "Adapter for Viessmannapi",
+  "_from": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+  "_id": "iobroker.viessmannapi@2.0.0",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/iobroker.viessmannapi",
+  "_phantomChildren": {
+    "side-channel": "1.0.4"
+  },
+  "_requested": {
+    "type": "git",
+    "raw": "TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+    "rawSpec": "TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+    "saveSpec": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+    "fetchSpec": null,
+    "gitCommittish": "f0b75f66cec428b2eb3571ae044bab895a5a8b30"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+  "_spec": "TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+  "_where": "/opt/iobroker",
   "author": {
     "name": "TA2k",
     "email": "tombox2020@gmail.com"
   },
-  "homepage": "https://github.com/TA2k/ioBroker.viessmannapi",
-  "license": "MIT",
-  "keywords": [
-    "Viessmannapi"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/TA2k/ioBroker.viessmannapi"
+  "bugs": {
+    "url": "https://github.com/TA2k/ioBroker.viessmannapi/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "@iobroker/adapter-core": "^2.5.1",
     "axios": "^0.21.1",
     "json-bigint": "^1.0.0",
     "qs": "^6.10.1"
   },
+  "deprecated": false,
+  "description": "Adapter for Viessmannapi",
   "devDependencies": {
     "@iobroker/testing": "^2.4.4",
     "@types/chai": "^4.2.21",
@@ -42,18 +59,25 @@
     "sinon-chai": "^3.7.0",
     "typescript": "^4.3.5"
   },
+  "homepage": "https://github.com/TA2k/ioBroker.viessmannapi",
+  "keywords": [
+    "Viessmannapi"
+  ],
+  "license": "MIT",
   "main": "main.js",
+  "name": "iobroker.viessmannapi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TA2k/ioBroker.viessmannapi.git"
+  },
   "scripts": {
+    "check": "tsc --noEmit -p tsconfig.check.json",
+    "lint": "eslint",
+    "test": "npm run test:js && npm run test:package",
+    "test:integration": "mocha test/integration --exit",
     "test:js": "mocha --config test/mocharc.custom.json \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup).js}\"",
     "test:package": "mocha test/package --exit",
-    "test:unit": "mocha test/unit --exit",
-    "test:integration": "mocha test/integration --exit",
-    "test": "npm run test:js && npm run test:package",
-    "check": "tsc --noEmit -p tsconfig.check.json",
-    "lint": "eslint"
+    "test:unit": "mocha test/unit --exit"
   },
-  "bugs": {
-    "url": "https://github.com/TA2k/ioBroker.viessmannapi/issues"
-  },
-  "readmeFilename": "README.md"
+  "version": "2.0.0"
 }
