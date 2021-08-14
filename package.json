@@ -37,7 +37,7 @@
     "qs": "^6.10.1"
   },
   "deprecated": false,
-  "description": "Adapter for Viessmannapi",
+  "description": "Adapter for Viessmannapi Testbranch only",
   "devDependencies": {
     "@iobroker/testing": "^2.4.4",
     "@types/chai": "^4.2.21",
@@ -61,7 +61,7 @@
   },
   "homepage": "https://github.com/TA2k/ioBroker.viessmannapi",
   "keywords": [
-    "Viessmannapi"
+    "Viessmannapi Testbranch"
   ],
   "license": "MIT",
   "main": "main.js",

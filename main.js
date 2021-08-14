@@ -18,7 +18,7 @@ class Viessmannapi extends utils.Adapter {
     constructor(options) {
         super({
             ...options,
-            name: "viessmannapi",
+            name: "viessmannapi_testbranch",
         });
         this.on("ready", this.onReady.bind(this));
         this.on("stateChange", this.onStateChange.bind(this));
