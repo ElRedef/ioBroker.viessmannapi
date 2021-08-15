@@ -1,5 +1,5 @@
 {
-  "_from": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+  "_from": "github:ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
   "_id": "iobroker.viessmannapi_testbranch@0.0.0",
   "_inBundle": false,
   "_integrity": "",
@@ -9,25 +9,25 @@
   },
   "_requested": {
     "type": "git",
-    "raw": "TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
-    "rawSpec": "TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
-    "saveSpec": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+    "raw": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
+    "rawSpec": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
+    "saveSpec": "github:ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
     "fetchSpec": null,
-    "gitCommittish": "f0b75f66cec428b2eb3571ae044bab895a5a8b30"
+    "gitCommittish": "f4d494b552476a9d4753713900ccb1738f266636"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "github:TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
-  "_spec": "TA2k/ioBroker.viessmannapi#f0b75f66cec428b2eb3571ae044bab895a5a8b30",
+  "_resolved": "github:ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
+  "_spec": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
   "_where": "/opt/iobroker",
   "author": {
     "name": "TA2k",
     "email": "tombox2020@gmail.com"
   },
   "bugs": {
-    "url": "https://github.com/TA2k/ioBroker.viessmannapi/issues"
+    "url": "https://github.com/elredef/ioBroker.viessmannapi_testbranch/issues"
   },
   "bundleDependencies": false,
   "dependencies": {
@@ -37,7 +37,7 @@
     "qs": "^6.10.1"
   },
   "deprecated": false,
-  "description": "Adapter for Viessmannapi Testbranch only",
+  "description": "Adapter for Viessmannapi. Test for lesser datapoints",
   "devDependencies": {
     "@iobroker/testing": "^2.4.4",
     "@types/chai": "^4.2.21",
@@ -59,16 +59,16 @@
     "sinon-chai": "^3.7.0",
     "typescript": "^4.3.5"
   },
-  "homepage": "https://github.com/TA2k/ioBroker.viessmannapi",
+  "homepage": "https://github.com/elredef/ioBroker.viessmannapi_testbranch",
   "keywords": [
-    "Viessmannapi Testbranch"
+    "Viessmannapi_testbranch"
   ],
   "license": "MIT",
   "main": "main.js",
   "name": "iobroker.viessmannapi_testbranch",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TA2k/ioBroker.viessmannapi.git"
+    "url": "git+https://github.com/elredef/ioBroker.viessmannapi_testbranch.git"
   },
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.check.json",
