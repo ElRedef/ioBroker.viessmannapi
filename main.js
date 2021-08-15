@@ -120,6 +120,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.log.error("Please check username/password and deactivated Google Captcha in the Viessmann Settings");
                 return res.data;
             })
             .catch((error) => {
@@ -307,8 +308,8 @@ class Viessmannapi extends utils.Adapter {
                         if (data.length === 1) {
                             data = data[0];
                         }
-                        const extractPath = this.installationId + "." + device.id + "." + element.path;
-                        const forceIndex = null;
+                        let extractPath = this.installationId + "." + device.id + "." + element.path;
+                        let forceIndex = null;
 
                         this.extractKeys(this, extractPath, data, "feature", forceIndex, false, element.desc);
                     })
