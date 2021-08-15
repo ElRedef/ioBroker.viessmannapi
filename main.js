@@ -11,7 +11,7 @@ const axios = require("axios");
 const crypto = require("crypto");
 const qs = require("qs");
 const { extractKeys } = require("./lib/extractKeys");
-class Viessmannapi_testbranch extends utils.Adapter {
+class Viessmannapi extends utils.Adapter {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
      */
@@ -31,7 +31,7 @@ class Viessmannapi_testbranch extends utils.Adapter {
     async onReady() {
         // Reset the connection indicator during startup
         this.setState("info.connection", false, true);
-        this.setState("info.token", "leer", true);
+        this.setState("info.token", "leer", true); //JF
         if (this.config.interval < 0.5) {
             this.log.info("Set interval to minimum 0.5");
             this.config.interval = 0.5;
@@ -54,12 +54,7 @@ class Viessmannapi_testbranch extends utils.Adapter {
 
         await this.login();
         if (this.session.access_token) {
-            
-            //this.log.error("access token: "+this.session.access_token); //JF
             this.setState("info.token", this.session.access_token, true);  //JF
-
-
-
             await this.getDeviceIds();
             await this.updateDevices();
             //await this.getEvents();
@@ -253,7 +248,7 @@ class Viessmannapi_testbranch extends utils.Adapter {
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
                 for (const device of res.data.data) {
-                    this.idArray.push(device.id);
+                    this.idArray.push({ id: device.id, type: device.roles[0] });
                     await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
                         type: "device",
                         common: {
@@ -279,8 +274,7 @@ class Viessmannapi_testbranch extends utils.Adapter {
                 this.log.error(error);
             });
     }
-    async updateDevices() {
-        
+    async updateDevices(ignoreFilter) {
         const statusArray = [
             {
                 path: "features",
@@ -295,14 +289,12 @@ class Viessmannapi_testbranch extends utils.Adapter {
             "User-Agent": "ioBroker 2.0.0",
             Authorization: "Bearer " + this.session.access_token,
         };
-        this.idArray.forEach((id) => {
+        this.idArray.forEach((device) => {
             statusArray.forEach(async (element) => {
-                const url = element.url.replace("$id", id);
-                if (element.limit) {
-                    element.current += 1;
-                    if (element.current > element.limit) {
-                        return;
-                    }
+                const url = element.url.replace("$id", device.id);
+                if (!ignoreFilter && (device.type === "type:gateway" || device.type === "type:virtual")) {
+                    this.log.debug("ignore " + device.type);
+                    return;
                 }
                 await this.requestClient({
                     method: "get",
@@ -310,9 +302,7 @@ class Viessmannapi_testbranch extends utils.Adapter {
                     headers: headers,
                 })
                     .then((res) => {
-                        this.log.error(url); //JF
-                        //this.log.error(JSON.stringify(res.data)); //JF
-                        //this.log.error("------------------"); //JF
+                        this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
                         if (!res.data) {
                             return;
                         }
@@ -324,13 +314,8 @@ class Viessmannapi_testbranch extends utils.Adapter {
                         if (data.length === 1) {
                             data = data[0];
                         }*/
-                        let extractPath = this.installationId + "." + id + "." + element.path;
+                        let extractPath = this.installationId + "." + device.id + "." + element.path;
                         let forceIndex = null;
-                        const preferedArrayName = null;                                                                 
-                        if (element.path === "events") {
-                            forceIndex = true;
-                            extractPath = this.installationId + "." + element.path;
-                        }
 
                         
 
@@ -482,8 +467,8 @@ if (require.main !== module) {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
      */
-    module.exports = (options) => new Viessmannapi_testbranch(options);
+    module.exports = (options) => new Viessmannapi(options);
 } else {
     // otherwise start the instance directly
-    new Viessmannapi_testbranch();
+    new Viessmannapi();
 }
