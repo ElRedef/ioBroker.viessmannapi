@@ -11,7 +11,7 @@ const axios = require("axios");
 const crypto = require("crypto");
 const qs = require("qs");
 const { extractKeys } = require("./lib/extractKeys");
-class Viessmannapi extends utils.Adapter {
+class Viessmannapi_testbranch extends utils.Adapter {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
      */
@@ -486,8 +486,8 @@ if (require.main !== module) {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
      */
-    module.exports = (options) => new Viessmannapi(options);
+    module.exports = (options) => new Viessmannapi_testbranch(options);
 } else {
     // otherwise start the instance directly
-    new Viessmannapi();
+    new Viessmannapi_testbranch();
 }

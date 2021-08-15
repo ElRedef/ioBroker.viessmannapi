@@ -70,7 +70,7 @@
         "admin": ">=4.0.9"
       }
     ],
-    "installedFrom": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636"
+    "installedFrom": "ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9"
   },
   "encryptedNative": [
     "client_id",

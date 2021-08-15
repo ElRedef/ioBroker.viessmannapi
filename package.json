@@ -1,6 +1,6 @@
 {
-  "_from": "github:ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
-  "_id": "iobroker.viessmannapi_testbranch@0.0.0",
+  "_from": "github:ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9",
+  "_id": "iobroker.viessmannapi_testbranch@2.0.0",
   "_inBundle": false,
   "_integrity": "",
   "_location": "/iobroker.viessmannapi_testbranch",
@@ -9,18 +9,18 @@
   },
   "_requested": {
     "type": "git",
-    "raw": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
-    "rawSpec": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
-    "saveSpec": "github:ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
+    "raw": "ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9",
+    "rawSpec": "ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9",
+    "saveSpec": "github:ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9",
     "fetchSpec": null,
-    "gitCommittish": "f4d494b552476a9d4753713900ccb1738f266636"
+    "gitCommittish": "96f47f7c7671dc68ecca85a2b37325bb08111fa9"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "github:ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
-  "_spec": "ElRedef/ioBroker.viessmannapi_testbranch#f4d494b552476a9d4753713900ccb1738f266636",
+  "_resolved": "github:ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9",
+  "_spec": "ElRedef/ioBroker.viessmannapi_testbranch#96f47f7c7671dc68ecca85a2b37325bb08111fa9",
   "_where": "/opt/iobroker",
   "author": {
     "name": "TA2k",
