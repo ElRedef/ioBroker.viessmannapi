@@ -190,13 +190,13 @@ class Viessmannapi extends utils.Adapter {
                 if (res.data.data && res.data.data.length > 0) {
                     const installation = res.data.data[0];
                     const installationId = installation.id.toString();
-                    await this.setObjectNotExistsAsync(installationId, {
+                    /*await this.setObjectNotExistsAsync(installationId, {
                         type: "device",
                         common: {
                             name: installation.description,
                         },
                         native: {},
-                    });
+                    });*/
                     //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
                     //this.extractKeys(this, installationId, installation);
                     return installationId;
@@ -220,13 +220,13 @@ class Viessmannapi extends utils.Adapter {
                 if (res.data.data && res.data.data.length > 0) {
                     const gateway = res.data.data[0];
                     const gatewayId = gateway.serial.toString();
-                    await this.setObjectNotExistsAsync(this.installationId + ".installationGateway", {
+                    /*await this.setObjectNotExistsAsync(this.installationId + ".installationGateway", {
                         type: "device",
                         common: {
                             name: gatewayId,
                         },
                         native: {},
-                    });
+                    });*/
                     //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
                     //this.extractKeys(this, this.installationId + ".installationGateway", gateway);
                     return gatewayId;
@@ -249,21 +249,21 @@ class Viessmannapi extends utils.Adapter {
                 this.log.debug(JSON.stringify(res.data));
                 for (const device of res.data.data) {
                     this.idArray.push({ id: device.id, type: device.roles[0] });
-                    await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
+                    /*await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
                         type: "device",
                         common: {
                             name: device.modelId,
                         },
                         native: {},
-                    });
+                    });*/
 
-                    await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".general", {
+                    /*await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".general", {
                         type: "channel",
                         common: {
                             name: "General Device Information",
                         },
                         native: {},
-                    });
+                    });*/
 
 
                     //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
