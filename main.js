@@ -308,8 +308,8 @@ class Viessmannapi extends utils.Adapter {
                         if (data.length === 1) {
                             data = data[0];
                         }
-                        let extractPath = this.installationId + "." + device.id + "." + element.path;
-                        let forceIndex = null;
+                        const extractPath = this.installationId + "." + device.id + "." + element.path;
+                        const forceIndex = null;
 
                         this.extractKeys(this, extractPath, data, "feature", forceIndex, false, element.desc);
                     })
@@ -493,6 +493,8 @@ class Viessmannapi extends utils.Adapter {
                         if (error.response) {
                             this.log.error(JSON.stringify(error.response.data));
                         }
+                        this.log.error("URL: " + uriState.val);
+                        this.log.error("Data: " + JSON.stringify(data));
                     });
                 this.refreshTimeout = setTimeout(async () => {
                     await this.updateDevices();
