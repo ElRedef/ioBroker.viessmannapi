@@ -296,6 +296,7 @@ class Viessmannapi extends utils.Adapter {
                     this.log.debug("ignore " + device.type);
                     return;
                 }
+                this.log.error(url)
                 await this.requestClient({
                     method: "get",
                     url: url,
