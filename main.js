@@ -31,7 +31,6 @@ class Viessmannapi extends utils.Adapter {
     async onReady() {
         // Reset the connection indicator during startup
         this.setState("info.connection", false, true);
-        this.setState("info.token", "leer", true); //JF
         if (this.config.interval < 0.5) {
             this.log.info("Set interval to minimum 0.5");
             this.config.interval = 0.5;
@@ -54,17 +53,16 @@ class Viessmannapi extends utils.Adapter {
 
         await this.login();
         if (this.session.access_token) {
-            this.setState("info.token", this.session.access_token, true);  //JF
             await this.getDeviceIds();
-            await this.updateDevices();
-            //await this.getEvents();
+            await this.updateDevices(true);
+            await this.getEvents();
             this.updateInterval = setInterval(async () => {
                 await this.updateDevices();
             }, this.config.interval * 60 * 1000);
 
-            //this.eventInterval = setInterval(async () => {
-            //    await this.getEvents();
-            //}, this.config.eventInterval * 60 * 1000);
+            this.eventInterval = setInterval(async () => {
+                await this.getEvents();
+            }, this.config.eventInterval * 60 * 1000);
 
             this.refreshTokenInterval = setInterval(() => {
                 this.refreshToken();
@@ -296,14 +294,14 @@ class Viessmannapi extends utils.Adapter {
                     this.log.debug("ignore " + device.type);
                     return;
                 }
-                this.log.error(url)
                 await this.requestClient({
                     method: "get",
                     url: url,
                     headers: headers,
                 })
                     .then((res) => {
-                        this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
+                        //this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
+                        this.log.debug("updateDevices: " + url );
                         if (!res.data) {
                             return;
                         }
@@ -317,8 +315,6 @@ class Viessmannapi extends utils.Adapter {
                         }*/
                         let extractPath = this.installationId + "." + device.id + "." + element.path;
                         let forceIndex = null;
-
-                        
 
                         this.extractKeys(this, extractPath, res.data, "feature", forceIndex, false, element.desc);
                     })
@@ -347,10 +343,60 @@ class Viessmannapi extends utils.Adapter {
             });
         });
     }
+    async getEvents() {
+        const headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+            "User-Agent": "ioBroker 2.0.0",
+            Authorization: "Bearer " + this.session.access_token,
+        };
 
+        await this.requestClient({
+            method: "get",
+            url: "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId,
+            headers: headers,
+        })
+            .then((res) => {
+                //this.log.debug(JSON.stringify(res.data));
+                let url =  "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId;
+                this.log.debug("getEvents: " + url);
+                if (!res.data) {
+                    return;
+                }
+                let data = res.data;
+                const keys = Object.keys(res.data);
+                if (keys.length === 1) {
+                    data = res.data[keys[0]];
+                }
+                if (data.length === 1) {
+                    data = data[0];
+                }
 
+                //this.extractKeys(this, this.installationId + ".events", data, null, true);
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 401) {
+                    error.response && this.log.debug(JSON.stringify(error.response.data));
+                    this.log.info(element.path + " receive 401 error. Refresh Token in 30 seconds");
+                    clearTimeout(this.refreshTokenTimeout);
+                    this.refreshTokenTimeout = setTimeout(() => {
+                        this.refreshToken();
+                    }, 1000 * 30);
 
-
+                    return;
+                }
+                if (error.response && error.response.status === 429) {
+                    this.log.info("Rate limit reached. Will be reseted next day 02:00");
+                }
+                if (error.response && error.response.status === 502) {
+                    this.log.info(JSON.stringify(error.response.data));
+                    this.log.info("Please check the connection of your gateway");
+                }
+                this.log.error("Receiving Events");
+                this.log.error(error);
+                error.response && this.log.debug(JSON.stringify(error.response.data));
+            });
+    }
 
     async refreshToken() {
         await this.requestClient({
