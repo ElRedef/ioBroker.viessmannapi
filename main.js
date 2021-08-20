@@ -197,7 +197,7 @@ class Viessmannapi extends utils.Adapter {
                         },
                         native: {},
                     });*/
-                    //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
+                    //benötigt später eine separate Behandlung wenn überhaupt notwendig
                     //this.extractKeys(this, installationId, installation);
                     return installationId;
                 }
@@ -227,7 +227,7 @@ class Viessmannapi extends utils.Adapter {
                         },
                         native: {},
                     });*/
-                    //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
+                    //benötigt später eine separate Behandlung wenn überhaupt notwendig
                     //this.extractKeys(this, this.installationId + ".installationGateway", gateway);
                     return gatewayId;
                 }
@@ -266,7 +266,7 @@ class Viessmannapi extends utils.Adapter {
                     });*/
 
 
-                    //JF: benötigt später eine separate Behandlung wenn überhaupt notwendig
+                    //benötigt später eine separate Behandlung wenn überhaupt notwendig
                     //this.extractKeys(this, this.installationId + "." + device.id + ".general", device);
                 }
             })
