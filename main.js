@@ -10,7 +10,8 @@ const utils = require("@iobroker/adapter-core");
 const axios = require("axios");
 const crypto = require("crypto");
 const qs = require("qs");
-const { extractKeys } = require("./lib/extractKeys");
+const { extractKeys_features } = require("./lib/extractKeys_features");
+const { extractKeys_events } = require("./lib/extractKeys_events");
 class Viessmannapi extends utils.Adapter {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
@@ -44,7 +45,8 @@ class Viessmannapi extends utils.Adapter {
         this.eventInterval = null;
         this.reLoginTimeout = null;
         this.refreshTokenTimeout = null;
-        this.extractKeys = extractKeys;
+        this.extractKeys_features = extractKeys_features;
+        this.extractKeys_events = extractKeys_events;
         this.idArray = [];
         this.session = {};
         this.rangeMapSupport = {};
@@ -316,7 +318,7 @@ class Viessmannapi extends utils.Adapter {
                         let extractPath = this.installationId + "." + device.id + "." + element.path;
                         let forceIndex = null;
 
-                        this.extractKeys(this, extractPath, res.data, "feature", forceIndex, false, element.desc);
+                        this.extractKeys_features(this, extractPath, res.data, "feature", forceIndex, false, element.desc);
                     })
                     .catch((error) => {
                         if (error.response && error.response.status === 401) {
@@ -372,7 +374,7 @@ class Viessmannapi extends utils.Adapter {
                     data = data[0];
                 }
 
-                //this.extractKeys(this, this.installationId + ".events", data, null, true);
+                this.extractKeys_events(this, this.installationId + ".events", res.data, null, true);
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
@@ -461,15 +463,16 @@ class Viessmannapi extends utils.Adapter {
     async onStateChange(id, state) {
         if (state) {
             if (!state.ack) {
-                const deviceId = id.split(".")[2];
-                const parentPath = id.split(".").slice(1, -1).slice(1).join(".");
+                //const deviceId = id.split(".")[2];
+                //const parentPath = id.split(".").slice(1, -1).slice(1).join(".");
 
-                const uriState = await this.getStateAsync(parentPath + ".uri");
-                const idState = await this.getObjectAsync(parentPath + ".setValue");
-
+                //const uriState = await this.getStateAsync(parentPath + ".uri");
+                
+                const idState = await this.getObjectAsync(id);
+                const uriState = idState.common.uri;
                 const param = idState.common.param;
 
-                if (!uriState || !uriState.val) {
+                if (!uriState) {
                     this.log.info("No URI found");
                     return;
                 }
@@ -487,7 +490,7 @@ class Viessmannapi extends utils.Adapter {
                 };
                 await this.requestClient({
                     method: "post",
-                    url: uriState.val,
+                    url: uriState,
                     headers: headers,
                     data: data,
                 })
