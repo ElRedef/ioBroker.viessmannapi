@@ -12,6 +12,8 @@ const crypto = require("crypto");
 const qs = require("qs");
 const { extractKeys_features } = require("./lib/extractKeys_features");
 const { extractKeys_events } = require("./lib/extractKeys_events");
+const { extractKeys_installation } = require("./lib/extractKeys_installation");
+const { extractKeys_gateway } = require("./lib/extractKeys_gateway");
 class Viessmannapi extends utils.Adapter {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
@@ -47,6 +49,8 @@ class Viessmannapi extends utils.Adapter {
         this.refreshTokenTimeout = null;
         this.extractKeys_features = extractKeys_features;
         this.extractKeys_events = extractKeys_events;
+        this.extractKeys_installation = extractKeys_installation;
+        this.extractKeys_gateway = extractKeys_gateway;
         this.idArray = [];
         this.session = {};
         this.rangeMapSupport = {};
@@ -198,7 +202,7 @@ class Viessmannapi extends utils.Adapter {
                         native: {},
                     });*/
                     //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    //this.extractKeys(this, installationId, installation);
+                    this.extractKeys_installation(this, installationId, installation);
                     return installationId;
                 }
             })
@@ -228,7 +232,7 @@ class Viessmannapi extends utils.Adapter {
                         native: {},
                     });*/
                     //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    //this.extractKeys(this, this.installationId + ".installationGateway", gateway);
+                    this.extractKeys_gateway(this,  gateway);
                     return gatewayId;
                 }
             })
