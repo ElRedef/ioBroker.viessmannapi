@@ -204,7 +204,7 @@ class Viessmannapi extends utils.Adapter {
                         native: {},
                     });*/
                     //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    //this.extractKeys_installation(this, installationId, installation);
+                    this.extractKeys_installation(this, installationId, installation);
                     return installationId;
                 }
             })
@@ -234,7 +234,7 @@ class Viessmannapi extends utils.Adapter {
                         native: {},
                     });*/
                     //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    //this.extractKeys_gateway(this,  gateway);
+                    this.extractKeys_gateway(this,  gateway);
                     return gatewayId;
                 }
             })
@@ -273,7 +273,7 @@ class Viessmannapi extends utils.Adapter {
 
 
                     //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    //this.extractKeys_devices(this, device.id , device);
+                    this.extractKeys_devices(this, device.id , device);
                 }
             })
             .catch((error) => {
@@ -380,7 +380,7 @@ class Viessmannapi extends utils.Adapter {
                     data = data[0];
                 }
 
-                //this.extractKeys_events(this, this.installationId + ".events", res.data, null, true);
+                this.extractKeys_events(this, this.installationId + ".events", res.data, null, true);
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
