@@ -14,6 +14,7 @@ const { extractKeys_features } = require("./lib/extractKeys_features");
 const { extractKeys_events } = require("./lib/extractKeys_events");
 const { extractKeys_installation } = require("./lib/extractKeys_installation");
 const { extractKeys_gateway } = require("./lib/extractKeys_gateway");
+const { extractKeys_devices } = require("./lib/extractKeys_devices");
 class Viessmannapi extends utils.Adapter {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
@@ -51,6 +52,7 @@ class Viessmannapi extends utils.Adapter {
         this.extractKeys_events = extractKeys_events;
         this.extractKeys_installation = extractKeys_installation;
         this.extractKeys_gateway = extractKeys_gateway;
+        this.extractKeys_devices = extractKeys_devices;
         this.idArray = [];
         this.session = {};
         this.rangeMapSupport = {};
@@ -271,7 +273,7 @@ class Viessmannapi extends utils.Adapter {
 
 
                     //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    //this.extractKeys(this, this.installationId + "." + device.id + ".general", device);
+                    this.extractKeys_devices(this, device.id , device);
                 }
             })
             .catch((error) => {
