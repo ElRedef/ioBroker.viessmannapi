@@ -59,6 +59,34 @@ class Viessmannapi extends utils.Adapter {
 
         this.subscribeStates("*");
 
+
+        //States für den Connection COunter anlegen
+        await this.setObjectNotExistsAsync("info.ConnectionCounter", {
+            type: "state",
+            common: {
+                name: "ConnectionCounter",
+                read: true,
+                write: false,
+                type: "number",
+            },
+            native: {},
+        });
+        this.setState("info.ConnectionCounter", 0,true);
+
+
+        await this.setObjectNotExistsAsync("info.LastResetDate", {
+            type: "state",
+            common: {
+                name: "LastResetDate",
+                read: true,
+                write: false,
+                type: "string",
+            },
+            native: {},
+        });
+
+    
+
         await this.login();
         if (this.session.access_token) {
             await this.getDeviceIds();
@@ -100,6 +128,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 return res.data;
             })
             .catch((error) => {
@@ -128,6 +157,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 this.log.error("Please check username/password and deactivated Google Captcha in the Viessmann Settings");
                 return res.data;
             })
@@ -163,6 +193,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 this.session = res.data;
                 this.setState("info.connection", true, true);
                 return res.data;
@@ -193,6 +224,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 if (res.data.data && res.data.data.length > 0) {
                     const installation = res.data.data[0];
                     const installationId = installation.id.toString();
@@ -223,6 +255,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 if (res.data.data && res.data.data.length > 0) {
                     const gateway = res.data.data[0];
                     const gatewayId = gateway.serial.toString();
@@ -253,6 +286,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 for (const device of res.data.data) {
                     this.idArray.push({ id: device.id, type: device.roles[0] });
                     /*await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
@@ -310,6 +344,7 @@ class Viessmannapi extends utils.Adapter {
                     .then((res) => {
                         //this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
                         this.log.debug("updateDevices: " + url );
+                        this.incrementConnectionCounter();
                         if (!res.data) {
                             return;
                         }
@@ -366,6 +401,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 //this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 let url =  "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId;
                 this.log.debug("getEvents: " + url);
                 if (!res.data) {
@@ -417,6 +453,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter();
                 this.session = res.data;
                 this.setState("info.connection", true, true);
                 return res.data;
@@ -462,6 +499,33 @@ class Viessmannapi extends utils.Adapter {
     }
 
     /**
+     * Increments the connection counter
+     */
+    async incrementConnectionCounter()
+    {
+        this.log.info("IncrementingConnectionCounter");
+        
+        //Zähler inkrementieren
+        const n = await this.getStateAsync("info.ConnectionCounter");
+        this.setState("info.ConnectionCounter", n.val+1,true);
+
+        //Checken ob wir den Zähler auf 0 setzen müssen
+        var now = new Date();
+        //TODO: Korrektur um 2h da nicht um 0 Uhr zurück gesetzt wird
+        var date = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
+        const lastResetDate = await this.getStateAsync("info.LastResetDate");
+
+        if(lastResetDate.val!=date)
+        {
+            this.log.debug("Set ConnectionCounter to 0");
+            this.setState("info.LastResetDate", date,true);
+            this.setState("info.ConnectionCounter", 0,true);
+        }
+        
+
+    }
+
+    /**
      * Is called if a subscribed state changes
      * @param {string} id
      * @param {ioBroker.State | null | undefined} state
@@ -469,16 +533,15 @@ class Viessmannapi extends utils.Adapter {
     async onStateChange(id, state) {
         if (state) {
             if (!state.ack) {
-                //const deviceId = id.split(".")[2];
-                //const parentPath = id.split(".").slice(1, -1).slice(1).join(".");
+                const deviceId = id.split(".")[2];
+                const parentPath = id.split(".").slice(1, -1).slice(1).join(".");
 
-                //const uriState = await this.getStateAsync(parentPath + ".uri");
-                
-                const idState = await this.getObjectAsync(id);
-                const uriState = idState.common.uri;
+                const uriState = await this.getStateAsync(parentPath + ".uri");
+                const idState = await this.getObjectAsync(parentPath + ".setValue");
+
                 const param = idState.common.param;
 
-                if (!uriState) {
+                if (!uriState || !uriState.val) {
                     this.log.info("No URI found");
                     return;
                 }
@@ -496,12 +559,13 @@ class Viessmannapi extends utils.Adapter {
                 };
                 await this.requestClient({
                     method: "post",
-                    url: uriState,
+                    url: uriState.val,
                     headers: headers,
                     data: data,
                 })
                     .then((res) => {
                         this.log.debug(JSON.stringify(res.data));
+                        this.incrementConnectionCounter();
                         return res.data;
                     })
                     .catch((error) => {
@@ -509,6 +573,8 @@ class Viessmannapi extends utils.Adapter {
                         if (error.response) {
                             this.log.error(JSON.stringify(error.response.data));
                         }
+                        this.log.error("URL: " + uriState.val);
+                        this.log.error("Data: " + JSON.stringify(data));
                     });
                 this.refreshTimeout = setTimeout(async () => {
                     await this.updateDevices();
