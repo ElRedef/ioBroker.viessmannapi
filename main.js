@@ -7,14 +7,15 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
+const rax = require("retry-axios");
 const axios = require("axios");
 const crypto = require("crypto");
 const qs = require("qs");
-const { extractKeys_features } = require("./lib/extractKeys_features");
-const { extractKeys_events } = require("./lib/extractKeys_events");
-const { extractKeys_installation } = require("./lib/extractKeys_installation");
-const { extractKeys_gateway } = require("./lib/extractKeys_gateway");
-const { extractKeys_devices } = require("./lib/extractKeys_devices");
+const { extractKeys_features } = require("./lib/extractKeys_features");  //JF
+const { extractKeys_events } = require("./lib/extractKeys_events");//JF
+const { extractKeys_installation } = require("./lib/extractKeys_installation");//JF
+const { extractKeys_gateway } = require("./lib/extractKeys_gateway");//JF
+const { extractKeys_devices } = require("./lib/extractKeys_devices");//JF
 class Viessmannapi extends utils.Adapter {
     /**
      * @param {Partial<utils.AdapterOptions>} [options={}]
@@ -22,7 +23,7 @@ class Viessmannapi extends utils.Adapter {
     constructor(options) {
         super({
             ...options,
-            name: "viessmannapi_testbranch",
+            name: "viessmannapi_testbranch",//JF
         });
         this.on("ready", this.onReady.bind(this));
         this.on("stateChange", this.onStateChange.bind(this));
@@ -44,15 +45,22 @@ class Viessmannapi extends utils.Adapter {
             this.config.eventInterval = 0.5;
         }
         this.requestClient = axios.create();
+        this.requestClient.defaults.raxConfig = {
+            instance: this.requestClient,
+            statusCodesToRetry: [[500, 599]],
+            httpMethodsToRetry: ["POST"],
+        };
+        const interceptorId = rax.attach(this.requestClient);
+
         this.updateInterval = null;
         this.eventInterval = null;
         this.reLoginTimeout = null;
         this.refreshTokenTimeout = null;
-        this.extractKeys_features = extractKeys_features;
-        this.extractKeys_events = extractKeys_events;
-        this.extractKeys_installation = extractKeys_installation;
-        this.extractKeys_gateway = extractKeys_gateway;
-        this.extractKeys_devices = extractKeys_devices;
+        this.extractKeys_features = extractKeys_features;//JF
+        this.extractKeys_events = extractKeys_events;//JF
+        this.extractKeys_installation = extractKeys_installation;//JF
+        this.extractKeys_gateway = extractKeys_gateway;//JF
+        this.extractKeys_devices = extractKeys_devices;//JF
         this.idArray = [];
         this.session = {};
         this.rangeMapSupport = {};
@@ -60,7 +68,7 @@ class Viessmannapi extends utils.Adapter {
         this.subscribeStates("*");
 
 
-        //States für den Connection COunter anlegen
+        //States für den Connection Counter anlegen //JF
         await this.setObjectNotExistsAsync("info.ConnectionCounter", {
             type: "state",
             common: {
@@ -109,7 +117,7 @@ class Viessmannapi extends utils.Adapter {
         const [code_verifier, codeChallenge] = this.getCodeChallenge();
         const headers = {
             Accept: "*/*",
-            "User-Agent": "ioBroker 2.0.0",
+            "User-Agent": "ioBroker 2.0.3",
         };
         let data = {
             client_id: this.config.client_id,
@@ -128,7 +136,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter();//JF
                 return res.data;
             })
             .catch((error) => {
@@ -157,7 +165,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter();//JF
                 this.log.error("Please check username/password and deactivated Google Captcha in the Viessmann Settings");
                 return res.data;
             })
@@ -193,7 +201,7 @@ class Viessmannapi extends utils.Adapter {
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter();//JF
                 this.session = res.data;
                 this.setState("info.connection", true, true);
                 return res.data;
@@ -213,7 +221,7 @@ class Viessmannapi extends utils.Adapter {
         const headers = {
             "Content-Type": "application/json",
             Accept: "*/*",
-            "User-Agent": "ioBroker 2.0.0",
+            "User-Agent": "ioBroker 2.0.3",
             Authorization: "Bearer " + this.session.access_token,
         };
 
@@ -224,19 +232,11 @@ class Viessmannapi extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter();//JF
                 if (res.data.data && res.data.data.length > 0) {
                     const installation = res.data.data[0];
                     const installationId = installation.id.toString();
-                    /*await this.setObjectNotExistsAsync(installationId, {
-                        type: "device",
-                        common: {
-                            name: installation.description,
-                        },
-                        native: {},
-                    });*/
-                    //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    this.extractKeys_installation(this, installationId, installation);
+                    this.extractKeys_installation(this, installationId, installation);//JF
                     return installationId;
                 }
             })
@@ -255,19 +255,11 @@ class Viessmannapi extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter();//JF
                 if (res.data.data && res.data.data.length > 0) {
                     const gateway = res.data.data[0];
                     const gatewayId = gateway.serial.toString();
-                    /*await this.setObjectNotExistsAsync(this.installationId + ".installationGateway", {
-                        type: "device",
-                        common: {
-                            name: gatewayId,
-                        },
-                        native: {},
-                    });*/
-                    //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    this.extractKeys_gateway(this,  gateway);
+                    this.extractKeys_gateway(this,  gateway);//JF
                     return gatewayId;
                 }
             })
@@ -286,28 +278,14 @@ class Viessmannapi extends utils.Adapter {
         })
             .then(async (res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter(); //JF
                 for (const device of res.data.data) {
-                    this.idArray.push({ id: device.id, type: device.roles[0] });
-                    /*await this.setObjectNotExistsAsync(this.installationId + "." + device.id, {
-                        type: "device",
-                        common: {
-                            name: device.modelId,
-                        },
-                        native: {},
-                    });*/
-
-                    /*await this.setObjectNotExistsAsync(this.installationId + "." + device.id + ".general", {
-                        type: "channel",
-                        common: {
-                            name: "General Device Information",
-                        },
-                        native: {},
-                    });*/
+                    this.idArray.push({ id: device.id, type: device.roles[0] });//JF
 
 
-                    //benötigt später eine separate Behandlung wenn überhaupt notwendig
-                    this.extractKeys_devices(this, device.id , device);
+
+
+                    this.extractKeys_devices(this, device.id , device);//JF
                 }
             })
             .catch((error) => {
@@ -326,12 +304,13 @@ class Viessmannapi extends utils.Adapter {
         const headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             Accept: "application/json",
-            "User-Agent": "ioBroker 2.0.0",
+            "User-Agent": "ioBroker 2.0.3",
             Authorization: "Bearer " + this.session.access_token,
         };
         this.idArray.forEach((device) => {
             statusArray.forEach(async (element) => {
                 const url = element.url.replace("$id", device.id);
+		//JF
                 if (!ignoreFilter && (device.type === "type:gateway" || device.type === "type:virtual")) {
                     this.log.debug("ignore " + device.type);
                     return;
@@ -342,23 +321,15 @@ class Viessmannapi extends utils.Adapter {
                     headers: headers,
                 })
                     .then((res) => {
-                        //this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
-                        this.log.debug("updateDevices: " + url );
-                        this.incrementConnectionCounter();
+			 this.log.debug(url + " " + device.id + " " + JSON.stringify(res.data));
+                        this.incrementConnectionCounter(); //JF
                         if (!res.data) {
                             return;
                         }
-                        /*let data = res.data;
-                        const keys = Object.keys(res.data);
-                        if (keys.length === 1) {
-                            data = res.data[keys[0]];
-                        }
-                        if (data.length === 1) {
-                            data = data[0];
-                        }*/
+
+			 //JF
                         let extractPath = this.installationId + "." + device.id + "." + element.path;
                         let forceIndex = null;
-
                         this.extractKeys_features(this, extractPath, res.data, "feature", forceIndex, false, element.desc);
                     })
                     .catch((error) => {
@@ -379,6 +350,9 @@ class Viessmannapi extends utils.Adapter {
                             this.log.info(JSON.stringify(error.response.data));
                             this.log.info("Please check the connection of your gateway");
                         }
+                        if (error.response && error.response.status === 504) {
+                            this.log.info("Viessmann API is not available please try again later");
+                        }
                         this.log.error(element.url);
                         this.log.error(error);
                         error.response && this.log.debug(JSON.stringify(error.response.data));
@@ -390,7 +364,7 @@ class Viessmannapi extends utils.Adapter {
         const headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             Accept: "application/json",
-            "User-Agent": "ioBroker 2.0.0",
+            "User-Agent": "ioBroker 2.0.3",
             Authorization: "Bearer " + this.session.access_token,
         };
 
@@ -400,10 +374,8 @@ class Viessmannapi extends utils.Adapter {
             headers: headers,
         })
             .then((res) => {
-                //this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
-                let url =  "https://api.viessmann.com/iot/v1/events-history/events?gatewaySerial=" + this.gatewaySerial + "&installationId=" + this.installationId;
-                this.log.debug("getEvents: " + url);
+                this.log.debug(JSON.stringify(res.data));
+                this.incrementConnectionCounter(); //JF
                 if (!res.data) {
                     return;
                 }
@@ -416,12 +388,13 @@ class Viessmannapi extends utils.Adapter {
                     data = data[0];
                 }
 
-                this.extractKeys_events(this, this.installationId + ".events", res.data, null, true);
+                this.extractKeys_events(this, this.installationId + ".events", res.data, null, true);//JF
             })
             .catch((error) => {
                 if (error.response && error.response.status === 401) {
                     error.response && this.log.debug(JSON.stringify(error.response.data));
-                    this.log.info(element.path + " receive 401 error. Refresh Token in 30 seconds");
+
+                    this.log.info("Get Events receive 401 error. Refresh Token in 30 seconds");
                     clearTimeout(this.refreshTokenTimeout);
                     this.refreshTokenTimeout = setTimeout(() => {
                         this.refreshToken();
@@ -436,6 +409,9 @@ class Viessmannapi extends utils.Adapter {
                     this.log.info(JSON.stringify(error.response.data));
                     this.log.info("Please check the connection of your gateway");
                 }
+                if (error.response && error.response.status === 504) {
+                    this.log.info("Viessmann API is not available please try again later");
+                }
                 this.log.error("Receiving Events");
                 this.log.error(error);
                 error.response && this.log.debug(JSON.stringify(error.response.data));
@@ -447,13 +423,14 @@ class Viessmannapi extends utils.Adapter {
             method: "post",
             url: "https://iam.viessmann.com/idp/v2/token",
             headers: {
+                "User-Agent": "ioBroker 2.0.3",
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             data: "grant_type=refresh_token&client_id=" + this.config.client_id + "&refresh_token=" + this.session.refresh_token,
         })
             .then((res) => {
                 this.log.debug(JSON.stringify(res.data));
-                this.incrementConnectionCounter();
+                this.incrementConnectionCounter(); //JF
                 this.session = res.data;
                 this.setState("info.connection", true, true);
                 return res.data;
@@ -486,6 +463,7 @@ class Viessmannapi extends utils.Adapter {
      */
     onUnload(callback) {
         try {
+            this.setState("info.connection", false, true);
             clearTimeout(this.refreshTimeout);
             clearTimeout(this.reLoginTimeout);
             clearTimeout(this.refreshTokenTimeout);
@@ -499,7 +477,7 @@ class Viessmannapi extends utils.Adapter {
     }
 
     /**
-     * Increments the connection counter
+     * Increments the connection counter //JF
      */
     async incrementConnectionCounter()
     {
@@ -555,6 +533,7 @@ class Viessmannapi extends utils.Adapter {
                 const headers = {
                     "Content-Type": "application/json",
                     Accept: "*/*",
+                    "User-Agent": "ioBroker 2.0.3",
                     Authorization: "Bearer " + this.session.access_token,
                 };
                 await this.requestClient({
@@ -562,10 +541,24 @@ class Viessmannapi extends utils.Adapter {
                     url: uriState.val,
                     headers: headers,
                     data: data,
+                    raxConfig: {
+                        retry: 5,
+                        noResponseRetries: 2,
+                        retryDelay: 5000,
+                        backoffType: "static",
+                        statusCodesToRetry: [[500, 599]],
+                        onRetryAttempt: (err) => {
+                            const cfg = rax.getConfig(err);
+                            if (err.response) {
+                                this.log.error(JSON.stringify(err.response.data));
+                            }
+                            this.log.info(`Retry attempt #${cfg.currentRetryAttempt}`);
+                        },
+                    },
                 })
                     .then((res) => {
                         this.log.debug(JSON.stringify(res.data));
-                        this.incrementConnectionCounter();
+                        this.incrementConnectionCounter(); //JF
                         return res.data;
                     })
                     .catch((error) => {

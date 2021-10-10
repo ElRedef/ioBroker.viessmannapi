@@ -1,11 +1,19 @@
 {
   "common": {
     "name": "viessmannapi_testbranch",
-    "version": "0.0.0",
+    "version": "2.0.3b",
     "news": {
-      "0.0.0": {
-        "en": "initial release",
-        "de": "Erstveröffentlichung",
+      "2.0.3": {
+        "en": "Fix virtual device detection",
+        "de": "Virtuelle Geräteerkennung für Rate Limit verbessert"
+      },
+      "2.0.2": {
+        "en": "Add retry on failed setValues",
+        "de": "Wiederholung eingebaut falls setValue fehlschlägt."
+      },
+      "2.0.1": {
+        "en": "initial release for new API. States are changed.",
+        "de": "Erstveröffentlichung neue API. Datenpunkte haben sich geändert.",
         "ru": "Начальная версия",
         "pt": "lançamento inicial",
         "nl": "Eerste uitgave",
@@ -84,7 +92,8 @@
     "username": "",
     "password": "",
     "client_id": "",
-    "interval": 5
+    "interval": 5,
+    "eventInterval": 300
   },
   "objects": [],
   "instanceObjects": [
